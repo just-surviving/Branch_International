@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: branch_postgres
+    environment:
+      POSTGRES_USER: branch
+      POSTGRES_PASSWORD: branch123
+      POSTGRES_DB: branch_messaging
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U branch -d branch_messaging"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - branch_network
+
+  backend:
+    build: ./backend
+    container_name: branch_backend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://branch:branch123@postgres:5432/branch_messaging
+      PORT: 3000
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:5173
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./GeneralistRails_Project_MessageData.csv:/app/GeneralistRails_Project_MessageData.csv
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && npm run dev"
+    networks:
+      - branch_network
+
+  frontend:
+    build: ./frontend
+    container_name: branch_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+      VITE_WS_URL: http://localhost:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+    networks:
+      - branch_network
+
+volumes:
+  postgres_data:
+
+networks:
+  branch_network:
+    driver: bridge
