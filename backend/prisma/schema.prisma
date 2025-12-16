@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id            Int            @id @default(autoincrement())
+  userId        Int            @unique // This maps to "User ID" from CSV
+  name          String?
+  email         String?
+  phone         String?
+  accountStatus String         @default("active")
+  creditScore   Int?
+  accountAge    String?
+  loanStatus    String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  messages      Message[]
+  conversations Conversation[]
+}
+
+model Message {
+  id             Int           @id @default(autoincrement())
+  customerId     Int
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  conversationId Int?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
+  content        String        @db.Text
+  direction      Direction // inbound or outbound
+  urgencyScore   Int           @default(5) // 1-10 scale
+  urgencyLevel   UrgencyLevel  @default(MEDIUM)
+  status         MessageStatus @default(UNREAD)
+  agentId        Int?
+  agent          Agent?        @relation(fields: [agentId], references: [id])
+  timestamp      DateTime // This maps to "Timestamp (UTC)" from CSV
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([customerId])
+  @@index([urgencyLevel])
+  @@index([status])
+  @@index([timestamp])
+}
+
+model Agent {
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  status        AgentStatus    @default(AVAILABLE)
+  lastActiveAt  DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  messages      Message[]
+  conversations Conversation[]
+}
+
+model Conversation {
+  id            Int                @id @default(autoincrement())
+  customerId    Int
+  customer      Customer           @relation(fields: [customerId], references: [id])
+  agentId       Int?
+  agent         Agent?             @relation(fields: [agentId], references: [id])
+  status        ConversationStatus @default(OPEN)
+  lastMessageAt DateTime           @default(now())
+  resolvedAt    DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  messages      Message[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([lastMessageAt])
+}
+
+model CannedResponse {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String   @db.Text
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Direction {
+  INBOUND
+  OUTBOUND
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+  RESOLVED
+}
+
+enum AgentStatus {
+  AVAILABLE
+  BUSY
+  OFFLINE
+}
+
+enum ConversationStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
