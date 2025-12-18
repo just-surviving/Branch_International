@@ -17,13 +17,18 @@ const prisma = new PrismaClient();
 const app = express();
 const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: [
-      process.env.FRONTEND_URL || 'http://localhost:5173',
+// CORS origins for different environments
+const corsOrigins = process.env.NODE_ENV === 'production'
+  ? [process.env.FRONTEND_URL || 'https://branch-messaging.vercel.app']
+  : [
+      'http://localhost:5173',
       'http://localhost:5174',
       'http://localhost:5175'
-    ],
+    ];
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: corsOrigins,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -31,11 +36,7 @@ const io = new Server(httpServer, {
 
 // Middleware
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175'
-  ],
+  origin: corsOrigins,
   credentials: true
 }));
 app.use(express.json());

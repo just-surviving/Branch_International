@@ -1,0 +1,27 @@
+databases:
+  - name: branch-postgres
+    databaseName: branch_messaging
+    user: branch
+    plan: free
+    region: oregon
+
+services:
+  - type: web
+    name: branch-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate
+    startCommand: npx prisma migrate deploy && npx prisma db seed && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: branch-postgres
+          property: connectionString
+      - key: FRONTEND_URL
+        value: https://branch-messaging.vercel.app
