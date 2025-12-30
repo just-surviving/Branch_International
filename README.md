@@ -1,194 +1,188 @@
-# Branch Messaging Platform 🚀
+# Branch Messaging Platform
 
-A complete, production-ready customer service messaging platform for Branch International built with React, Node.js, PostgreSQL, and real-time WebSocket communication.
+A production-ready customer service messaging platform built with React, Node.js, PostgreSQL, and real-time WebSocket communication.
 
-## ✨ Features
+## Features
 
-- **Real-time Messaging**: Instant bidirectional communication using Socket.io
-- **Intelligent Urgency Detection**: Keyword-based algorithm to prioritize customer messages (CRITICAL/HIGH/MEDIUM/LOW)
-- **Multi-Agent Support**: Multiple customer service agents can handle conversations simultaneously
-- **CSV Data Import**: Automatically imports 100 real customer messages from provided CSV file
-- **Advanced Search**: Full-text search across messages, customers, and conversations
-- **Canned Responses**: 12 pre-built quick-reply templates across 7 categories
-- **Customer Context Panel**: Complete customer information (credit score, loan status, account details)
-- **Modern UI/UX**: Built with React 18, TypeScript, Tailwind CSS
-- **Agent Dashboard**: Three-panel layout (conversations, messages, customer info)
-- **Customer Portal**: Public-facing message submission form
-- **🆕 Resizable Sidebar**: WhatsApp-style draggable conversation list (280px - 600px)
-- **🆕 Dark/Light Theme**: Toggle between themes with persistent preferences
-- **🆕 Smart Auto-Sorting**: Conversations automatically sorted by urgency level
+- **Real-time Messaging** - Instant bidirectional communication using Socket.io
+- **Intelligent Urgency Detection** - Keyword-based prioritization (CRITICAL/HIGH/MEDIUM/LOW)
+- **Multi-Agent Support** - Multiple customer service agents can handle conversations simultaneously
+- **Advanced Search** - Full-text search across messages, customers, and conversations
+- **Canned Responses** - Pre-built quick-reply templates for common inquiries
+- **Customer Context Panel** - Complete customer information display for agents
+- **Dark/Light Theme** - Toggle between themes with persistent preferences
+- **Resizable Sidebar** - Draggable conversation list panel
 
-## 🎬 Real-Time Demo
+## Tech Stack
 
-### Quick Demo Setup
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS |
+| **Backend** | Node.js, Express, TypeScript, Socket.io |
+| **Database** | PostgreSQL with Prisma ORM |
+| **DevOps** | Docker, Docker Compose |
 
-1. **Start the application**:
-   ```powershell
-   # Terminal 1 - PostgreSQL
-   docker start postgres-branch
-   
-   # Terminal 2 - Backend
-   cd backend
-   npm run dev
-   
-   # Terminal 3 - Frontend  
-   cd frontend
-   npm run dev
-   ```
+## Quick Start
 
-2. **Open Agent Portal**: http://localhost:5173/login
-   - Login as: `michael.chen@branch.com`
+### Prerequisites
 
-3. **Run automated demo** (in new terminal):
-   ```powershell
-   node demo-script.js staggered
-   ```
+- Node.js 18+
+- Docker & Docker Compose
+- PostgreSQL (or use Docker)
 
-4. **Watch real-time magic** ✨
-   - 6 customers send messages
-   - Conversations appear instantly
-   - Auto-sorted by urgency (CRITICAL → LOW)
-   - Real-time message delivery
-
-### Demo Modes
-- `sequential` - One scenario at a time (easy to follow)
-- `parallel` - All at once (high volume simulation)
-- `staggered` - 2-second delays (realistic, **recommended**)
-
-📖 **Full demo guide**: See `DEMO_GUIDE.md` for complete scenarios  
-🚀 **Quick start**: See `DEMO_QUICK_START.md` for video recording tips
-
-## 🛠️ Technology Stack
-
-**Backend:** Node.js 18+ • Express • TypeScript • Socket.io • PostgreSQL • Prisma ORM  
-**Frontend:** React 18 • TypeScript • Vite • Tailwind CSS • Socket.io-client • React Router  
-**DevOps:** Docker • Docker Compose
-
-## 🚀 Quick Start with Docker
+### 1. Clone & Install
 
 ```bash
-# Start all services (recommended)
-docker-compose up --build
+git clone <repository-url>
+cd branch-messaging-platform
 
-# Access the application
-# Agent Portal: http://localhost:5173
-# Customer Form: http://localhost:5173/customer
-# Backend API: http://localhost:3000/api
+# Install dependencies
+cd backend && npm install
+cd ../frontend && npm install
 ```
 
-## 🎯 Demo Login
+### 2. Database Setup
 
-Navigate to http://localhost:5173 and use any of these demo accounts:
+```bash
+# Start PostgreSQL with Docker
+docker-compose up -d postgres
+
+# Run migrations and seed data
+cd backend
+npx prisma migrate dev
+npm run seed
+```
+
+### 3. Start the Application
+
+```bash
+# Terminal 1 - Backend
+cd backend
+npm run dev
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+```
+
+### 4. Access the Application
+
+| URL | Description |
+|-----|-------------|
+| http://localhost:5173 | Agent Portal |
+| http://localhost:5173/customer | Customer Message Form |
+| http://localhost:3000/api | Backend API |
+
+### Demo Accounts
+
+Login with any of these emails (password not required for demo):
+
 - `sarah.johnson@branch.com`
 - `michael.chen@branch.com`
 - `emily.rodriguez@branch.com`
 - `david.kim@branch.com`
 
-**Password:** any (demo mode)
+## Project Structure
 
-## 📁 Full Project Structure
-
-See complete 195-line structure in full README documentation.
-
-## 🔍 Key API Endpoints
-
-- `GET /api/messages` - List messages with filters
-- `POST /api/messages/:id/reply` - Send agent reply
-- `GET /api/conversations` - List conversations (sorted by urgency)
-- `GET /api/search?q=query` - Global search
-- `GET /api/stats` - Dashboard statistics
-- `GET /api/canned-responses` - Quick reply templates
-
-## 🌐 WebSocket Events
-
-**Agent:** `agent:join`, `agent:typing`, `message:reply`  
-**Customer:** `message:new`  
-**System:** `message:received`, `message:sent`, `conversation:resolved`
-
-## 🎨 Urgency Detection
-
-Messages auto-scored 1-10:
-- **CRITICAL (10)**: fraud, hack, locked out, emergency
-- **HIGH (8)**: rejected, denied, payment failed
-- **MEDIUM (5)**: help, question, how to
-- **LOW (3)**: thanks, received, ok
-
-## 📦 Local Development
-
-### Backend
-```bash
-cd backend
-npm install
-npx prisma migrate dev
-npm run dev
+```
+branch-messaging-platform/
+├── backend/
+│   ├── prisma/           # Database schema and migrations
+│   ├── src/
+│   │   ├── controllers/  # Request handlers
+│   │   ├── routes/       # API routes
+│   │   ├── services/     # Business logic
+│   │   ├── sockets/      # WebSocket handlers
+│   │   └── server.ts     # Express app entry
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/   # React components
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── pages/        # Page components
+│   │   ├── services/     # API & Socket services
+│   │   └── App.tsx       # Root component
+│   └── package.json
+├── docker-compose.yml    # Container orchestration
+└── README.md
 ```
 
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/conversations` | List all conversations |
+| GET | `/api/conversations/:id` | Get conversation with messages |
+| GET | `/api/messages` | List messages with filters |
+| POST | `/api/messages/:id/reply` | Send agent reply |
+| GET | `/api/search?q=query` | Global search |
+| GET | `/api/canned-responses` | Get quick reply templates |
+| GET | `/api/stats` | Dashboard statistics |
+
+## WebSocket Events
+
+| Event | Direction | Description |
+|-------|-----------|-------------|
+| `agent:join` | Client → Server | Agent connects |
+| `message:new` | Client → Server | Customer sends message |
+| `message:reply` | Client → Server | Agent sends reply |
+| `message:received` | Server → Client | New message broadcast |
+| `message:sent` | Server → Client | Reply confirmation |
+
+## Urgency Detection
+
+Messages are automatically scored 1-10 based on content:
+
+| Level | Score | Keywords |
+|-------|-------|----------|
+| CRITICAL | 10 | fraud, hacked, locked out, emergency |
+| HIGH | 8 | rejected, denied, payment failed, loan approval |
+| MEDIUM | 5 | help, question, how to |
+| LOW | 3 | thanks, information, ok |
+
+## Environment Variables
+
+Create `.env` files in both `backend/` and `frontend/` directories:
+
+```env
+# backend/.env
+DATABASE_URL="postgresql://user:password@localhost:5432/branch_messaging"
+PORT=3000
+FRONTEND_URL="http://localhost:5173"
+
+# frontend/.env
+VITE_API_URL="http://localhost:3000"
+VITE_WS_URL="http://localhost:3000"
 ```
 
-## 🐛 Troubleshooting
+## Docker Deployment
 
-**Database connection issues:**
 ```bash
-docker-compose restart postgres
+# Build and start all services
+docker-compose up --build
+
+# Or run in background
+docker-compose up -d
 ```
 
-**Port conflicts:**
-```bash
-npx kill-port 3000  # Backend
-npx kill-port 5173  # Frontend
-```
-
-**Re-seed database:**
-```bash
-cd backend
-npm run seed
-```
-
-## 📝 CSV Format
-
-Required columns:
-- `User ID` - Customer identifier
-- `Timestamp (UTC)` - Message timestamp  
-- `Message Body` - Customer message
-
-## 🧪 Testing
+## Testing
 
 ```bash
 # Backend
-cd backend
-npm test
+cd backend && npm test
 
 # Frontend
-cd frontend
-npm test
+cd frontend && npm test
 ```
 
-## 📊 Database Schema
+## Demo Script
 
-**5 Models:** Customer, Message, Conversation, Agent, CannedResponse  
-**5 Enums:** Direction, UrgencyLevel, MessageStatus, AgentStatus, ConversationStatus
+Run the automated demo to simulate real-time customer messages:
 
-## 🛠️ Development Scripts
+```bash
+node demo-script.js staggered
+```
 
-**Backend:**
-- `npm run dev` - Start with hot-reload
-- `npm run build` - Compile TypeScript
-- `npm run prisma:studio` - Open DB GUI
+## License
 
-**Frontend:**
-- `npm run dev` - Start Vite dev server
-- `npm run build` - Production build
-- `npm run preview` - Preview build
-
-## 📄 License
-
-Proprietary © 2024 Branch International
-
----
-
-**Built with ❤️ using React • Node.js • PostgreSQL • Socket.io**
+© 2025 Branch International. All rights reserved.

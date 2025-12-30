@@ -20,7 +20,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const [isTyping, setIsTyping] = useState(false);
   const [showCannedResponses, setShowCannedResponses] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -66,7 +66,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
       setMessage('');
       setIsTyping(false);
       sendStoppedTyping(conversationId);
-      
+
       toast.success('Message sent');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -88,7 +88,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="bg-white border-t border-gray-200 px-6 py-4">
+    <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       {/* Canned Responses */}
       {showCannedResponses && (
         <div className="mb-4">
@@ -105,14 +105,14 @@ const MessageInput: React.FC<MessageInputProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCannedResponses(!showCannedResponses)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             title="Canned responses"
             disabled={disabled}
           >
             <Smile className="w-5 h-5" />
           </button>
           <button
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             title="Attach file"
             disabled={disabled}
           >
@@ -132,7 +132,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
             onKeyDown={handleKeyDown}
             placeholder={disabled ? 'Conversation is resolved' : 'Type your message...'}
             disabled={disabled}
-            className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
             rows={1}
           />
         </div>
@@ -149,7 +149,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
       </div>
 
       {/* Character count */}
-      <div className="mt-2 text-xs text-gray-400 text-right">
+      <div className="mt-2 text-xs text-gray-400 dark:text-gray-500 text-right">
         {message.length} characters
       </div>
     </div>

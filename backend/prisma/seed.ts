@@ -145,6 +145,7 @@ async function main() {
   // Import messages from CSV
   // Try multiple paths for Docker and local development
   const possiblePaths = [
+    path.resolve(__dirname, './seed-data.csv'),
     path.resolve(__dirname, '../../GeneralistRails_Project_MessageData.csv'),
     path.resolve(__dirname, '../GeneralistRails_Project_MessageData.csv'),
     '/app/GeneralistRails_Project_MessageData.csv',
@@ -169,7 +170,7 @@ async function main() {
     console.log('   Looked in:', possiblePaths);
   } else {
     console.log(`📄 Importing messages from: ${csvPath}`);
-    
+
     try {
       await importMessagesFromCSV(csvPath);
       console.log('✅ CSV import completed');

@@ -7,7 +7,7 @@ import EmptyState from '../common/EmptyState';
 import { getConversation } from '../../services/api';
 import { onMessageReceived, onMessageSent, offMessageReceived, offMessageSent } from '../../services/socketService';
 import { formatDate } from '../../utils/formatters';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 interface MessageThreadProps {
   conversation: Conversation;
@@ -67,7 +67,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({ conversation, onResolve }
 
   const groupMessagesByDate = (messages: Message[]) => {
     const groups: { [key: string]: Message[] } = {};
-    
+
     messages.forEach((message) => {
       const date = formatDate(message.timestamp);
       if (!groups[date]) {
@@ -90,15 +90,15 @@ const MessageThread: React.FC<MessageThreadProps> = ({ conversation, onResolve }
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-gray-50">
+    <div className="flex-1 flex flex-col h-full bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               {conversation.customer?.name || 'Unknown Customer'}
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               User ID: {conversation.customer?.userId}
             </p>
           </div>
@@ -112,7 +112,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({ conversation, onResolve }
             </button>
           )}
           {conversation.status === 'RESOLVED' && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg">
+            <div className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg">
               <CheckCircle className="w-4 h-4" />
               Resolved
             </div>
@@ -129,7 +129,7 @@ const MessageThread: React.FC<MessageThreadProps> = ({ conversation, onResolve }
             <div key={date}>
               {/* Date divider */}
               <div className="flex items-center justify-center mb-4">
-                <div className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full">
+                <div className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-3 py-1 rounded-full">
                   {date}
                 </div>
               </div>
