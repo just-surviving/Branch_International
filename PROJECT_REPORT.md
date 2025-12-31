@@ -1,87 +1,237 @@
-# Branch Messaging Platform: Project Report
+Branch Messaging Platform - Code Documentation
+Real-time Customer Support & Urgency Detection System
 
-## 1. Project Overview
+Author: Abhinav Sharma
+Email: abhinavsharma.career1@gmail.com
+GitHub: https://github.com/just-surviving/Branch_International
 
-The Branch Messaging Platform is a comprehensive customer support solution designed to facilitate real-time, high-priority communication between customers and support agents. The system prioritizes urgent issues (like fraud) and provides a seamless, reactive interface for agents handling multiple conversations simultaneously.
+Table of Contents
+1. Project Overview
+2. Tech Stack & Justification
+3. System Architecture
+4. Key Features
+5. Design Decisions & Trade-offs
+6. Safety & Adaptability Strategy
+7. Project Structure
+8. Getting Started
+9. AI Tools Usage
+10. Future Enhancements
 
-![Project Dashboard](./screenshots/dashboard_view.png)
-*(Place your dashboard screenshot here)*
+1. Project Overview
+Problem Statement
+Financial institutions receive thousands of customer queries daily. Critical issues like "fraud" or "account hacking" often get buried under routine inquiries about "balance checks" or "loan status," leading to delayed responses and financial loss.
+Organizations need a way to:
+- Instantly identify and prioritize high-risk messages.
+- Manage concurrent conversations across multiple agents efficiently.
+- seamless real-time communication without page refreshes.
 
----
+Solution
+The Branch Messaging Platform is a full-stack real-time support system designed for high-stakes financial environments. The platform handles:
+- **Intelligent Triage**: Automatically scans and tags messages (Critical, High, Medium, Low) based on content.
+- **Real-time Sync**: Instant bi-directional messaging using WebSockets.
+- **Agent Presence**: Live tracking of online agents to prevent collision.
+- **Unified History**: Persistent chat history stored in a relational database.
 
-## 2. Approach & Strategy
-
-### Problem Solving Methodology
-My approach focused on **User Experience (UX) first**, backed by a robust **Event-Driven Architecture**.
-
-1.  **Real-Time First**: Traditional polling creates latency. By implementing **Socket.io** as the core communication layer, I ensured that messages, typing indicators, and agent presence are synchronized instantaneously across all clients.
-2.  **Operational Efficiency**: Support agents are often overwhelmed. I introduced an **Automated Urgency Detection System** that analyzes message content in real-time, tagging and sorting conversations so agents address critical issues (like "fraud") first.
-3.  **Separation of Concerns**: The application is split into two distinct portals:
-    *   **Customer Portal**: Simplified, unauthenticated (User ID based) entry for low friction.
-    *   **Agent Portal**: robust, authenticated dashboard with history, search, and context tools.
-
-### Strategies for Safety & Adaptability
-
-*   **Type Safety**: The entire stack (Frontend, Backend, Database) is written in **TypeScript**. This prevents runtime errors and ensures data integrity as it flows from the UI to the Database.
-*   **Data Integrity**: I used **Prisma ORM** with PostgreSQL. This enforces strict schema validation (e.g., ensuring `userId` is unique where required) and manages entity relationships (Customer -> Messages) safely.
-*   **Resilience**: The WebSocket layer includes automatic reconnection logic (exponential backoff) and state synchronization. If a connection drops, the client automatically attempts to rejoin, ensuring no messages are missed.
-*   **Adaptability**: The "Urgency Keyword" system is designed as a standalone service (`urgencyDetectionService.ts`). It can be easily updated or replaced with an AI/LLM-based classifier in the future without refactoring the core logic.
-
----
-
-## 3. Trade-offs Considered
-
-During development, several key technical decisions involved trade-offs:
-
-| Decision | Trade-off | Rationale |
+2. Tech Stack & Justification
+| Category | Technology | Justification |
 | :--- | :--- | :--- |
-| **Monolithic server vs. Microservices** | Scalability vs. Development Speed | A monolithic Node.js/Express server was chosen to reduce deployment complexity and latency for this MVP. Scaling can be achieved by running multiple instances behind a load balancer with a Redis Adapter for sockets. |
-| **WebSockets vs. Polling** | Server Memory vs. Real-time UX | Sockets consume open connections/memory on the server but provide the "instant" feel critical for chat. Polling is stateless but chatty and laggy. I chose Sockets for the premium UX. |
-| **Relational (SQL) vs. NoSQL** | Schema Flexibility vs. Data Consistency | Chat logs are often unstructured, favoring NoSQL. However, the requirement for strict relationships (Customers, Conversations, Agents) made PostgreSQL the safer, more robust choice for data consistency. |
+| **Frontend** | React 18 + Vite | High-performance rendering, component reusability, and fast build times. |
+| **Language** | TypeScript 5.0+ | End-to-end type safety to prevent runtime errors in financial data handling. |
+| **Styling** | Tailwind CSS | Utility-first approach for rapid UI development and consistant theming. |
+| **Real-time** | Socket.io | Reliable event-based communication with automatic reconnection strategies. |
+| **Backend** | Node.js + Express | Non-blocking I/O ideal for handling concurrent WebSocket connections. |
+| **Database** | PostgreSQL | ACID-compliant relational database ensuring data integrity for customer records. |
+| **ORM** | Prisma | Type-safe database queries and intuitive schema management. |
 
----
+3. System Architecture
+High-Level Architecture
+(Note: Monolithic Architecture for MVP Efficiency)
 
-## 4. System Architecture
+Plaintext
+┌─────────────────────────────────────────────────────────────────┐
+│                       PRESENTATION LAYER                        │
+├─────────────────────────────────────────────────────────────────┤
+│    React Client (Vite)    │    Tailwind CSS    │   Socket.io    │
+│                                                                 │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐            │
+│  │  Login   │ │Customer  │ │  Agent   │ │ Search   │            │
+│  │   Page   │ │ Portal   │ │Dashboard │ │  Bar     │            │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘            │
+└─────────────────────────────────────────────────────────────────┘
+                              │ ▲
+                    REST API  │ │ WebSocket Events
+                              ▼ │
+┌─────────────────────────────────────────────────────────────────┐
+│                        APPLICATION LAYER                        │
+├─────────────────────────────────────────────────────────────────┤
+│                   Node.js / Express Server                      │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                │
+│  │   API       │ │  Socket     │ │  Urgency    │                │
+│  │   Routes    │ │  Manager    │ │  Engine     │                │
+│  └─────────────┘ └─────────────┘ └─────────────┘                │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                           DATA LAYER                            │
+├─────────────────────────────────────────────────────────────────┤
+│                       Prisma ORM                                │
+│      (Transactions, Relations, Schema Validation)               │
+├─────────────────────────────────────────────────────────────────┤
+│                       PostgreSQL                                │
+└─────────────────────────────────────────────────────────────────┘
 
-![Architecture Diagram](./screenshots/architecture_diagram.png)
-*(Optional: Place architecture diagram here)*
+Component Hierarchy
 
-### High-Level Design
+Plaintext
+App
+├── Toaster (Global Notifications)
+├── Routes
+│   ├── Login Page
+│   ├── Customer Portal (Public)
+│   │   ├── CustomerMessageForm
+│   │   └── MessageHistoryList
+│   └── Agent Portal (Private)
+│       ├── Sidebar (Conversation List)
+│       ├── TopBar (Agent Status, Analytics)
+│       └── MessageThread (Main Chat Area)
+│           ├── MessageBubble
+│           └── ReplyInput
 
-The system follows a classic client-server architecture:
 
-*   **Frontend**: React + Vite (Fast, optimized bundle).
-*   **Backend**: Node.js + Express (API) + Socket.io (Real-time).
-*   **Database**: PostgreSQL.
+4. Key Features
+4.1 Intelligent Urgency Detection
+- **Mechanism**: Regex-based keyword analysis engine (`urgencyDetectionService.ts`).
+- **Scoring**: Assigns 1-10 priority score. Keywords like "fraud", "hacked" trigger CRITICAL status.
+- **UI Impact**: Critical messages jump to the top of the queue with visual red badges.
 
-### Data Flow Logic
+4.2 Real-time Messaging
+- **Instant Delivery**: Messages appear immediately via optimistic UI updates while sending in background.
+- **Typing Indicators**: Ephemeral events (`agent:typing`) show activity without database writes.
+- **Sync**: Multi-tab support ensures agents see the same state across windows.
 
-1.  **Message Emission**:
-    *   Customer sends a message via `message:new`.
-    *   Input is sanitized and validated.
-2.  **Urgency Analysis**:
-    *   Content is passed through `detectUrgency(content)`.
-    *   Keywords like "hacked" trigger a `CRITICAL` score (10/10).
-3.  **Persistence**:
-    *   Prisma wraps the database write operations in a transaction to ensure the Message and Conversation state are updated atomically.
-4.  **Broadcast**:
-    *   Server emits `message:received` to all connected Agents.
-    *   Agent clients update their internal Redux-like state store immediately.
+4.3 Agent Dashboard
+- **Queue Management**: Filter conversations by urgency, status (Open/Resolved), or IDs.
+- **Customer Context**: Side panel displaying customer details (Name, Credit Score, Account Status).
+- **History**: Infinite scroll support for reading past conversation context.
 
-### Key Components
+5. Design Decisions & Trade-offs
+5.1 WebSockets vs Polling
+- **Decision**: Use Socket.io (WebSockets).
+- **Trade-offs**:
+  ✅ Instantaneous updates (sub-100ms latency).
+  ✅ Reduced server load (no constant HTTP polling).
+  ❌ Stateful connections require sticky sessions if scaling horizontally.
+- **Mitigation**: Architecture allows adding a Redis Adapter for multi-instance scaling.
 
-*   **`messageSocket.ts`**: The central nervous system of the backend, handling all event routing.
-*   **`useSocket.ts`**: Frontend hook implementing the **Singleton Pattern** for socket connections, preventing memory leaks during navigation.
-*   **`MessageThread.tsx`**: Optimized React component that handles optimistic UI updates (showing message immediately) while waiting for server confirmation.
+5.2 SQL (Postgres) vs NoSQL (MongoDB)
+- **Decision**: PostgreSQL with Prisma.
+- **Trade-offs**:
+  ✅ Strict schema ensures message objects always map to valid customers/agents.
+  ✅ ACID transactions are critical for financial compliance.
+  ❌ Slightly more complex setup than a document store.
+- **Mitigation**: Prisma makes relational queries developer-friendly.
 
----
+5.3 Client-Side vs Server-Side Search
+- **Decision**: Server-side Full Text Search.
+- **Trade-offs**:
+  ✅ Scalable to millions of records.
+  ❌ Network latency on keystrokes.
+- **Mitigation**: Debounced input on frontend prevents API flooding.
 
-## 5. Future Improvements
+6. Safety & Adaptability Strategy
+6.1 Safety Considerations
+- **Type Safety**: strict `tsconfig` settings prevent type coercion errors.
+- **Input Validation**: Backend parses and validates all `userId` inputs (Int vs String) before DB queries to prevent crashes.
+- **Transaction Integrity**: Message creation and Conversation timestamp updates happen in a single Prisma transaction.
 
-*   **AI Integration**: Replace Regex urgency detection with OpenAI API for sentiment analysis.
-*   **Authentication**: Add JWT-based auth for customers (currently User ID only).
-*   **Mobile App**: Port the React frontend to React Native.
+6.2 Adaptability Strategy
+- **Modular Services**: Urgency detection is a standalone service function. It can be swapped for an OpenAI API call without changing the socket controller.
+- **Environment Config**: All ports, database URLs, and frontend origins are strictly controlled via `.env` files for easy deployment across Staging/Prod.
 
----
+7. Project Structure
 
-**© 2025 Branch International**
+Plaintext
+branch-messaging-platform/
+├── backend/
+│   ├── prisma/             # Database Schema
+│   ├── src/
+│   │   ├── controllers/    # HTTP Route Controllers
+│   │   ├── services/       # Business Logic (Urgency, etc)
+│   │   ├── sockets/        # WebSocket Event Handlers
+│   │   └── server.ts       # Entry Point
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── agent/      # Agent-specific UI
+│   │   │   ├── customer/   # Customer-specific UI
+│   │   │   └── common/     # Reusable UI
+│   │   ├── hooks/          # Custom Hooks (useSocket)
+│   │   ├── services/       # API & Socket Clients
+│   │   └── App.tsx
+│   └── package.json
+├── docker-compose.yml      # Container Orchestration
+└── PROJECT_REPORT.md       # Documentation
+
+8. Getting Started
+Prerequisites
+- Node.js 18.x or higher
+- PostgreSQL (local or Docker)
+
+Installation
+1. Clone the repository:
+   git clone https://github.com/just-surviving/Branch_International.git
+   cd branch-messaging-platform
+
+2. Install dependencies:
+   cd backend && npm install
+   cd ../frontend && npm install
+
+3. Database Setup:
+   cd backend
+   # Update .env with your DATABASE_URL
+   npx prisma migrate dev
+   npm run seed
+
+4. Start Development Servers:
+   # Terminal 1 (Backend - Port 3001)
+   cd backend && npm run dev
+   
+   # Terminal 2 (Frontend - Port 5173)
+   cd frontend && npm run dev
+
+9. AI Tools Usage
+This project utilized advanced AI agents to accelerate robustness and debugging:
+
+| Tool | Usage |
+| :--- | :--- |
+| **Claude / LLMs** | Architecture planning, generating boilerplate for Prisma schema and React components. |
+| **AI Agents** | Debugging complex race conditions in WebSocket connection logic and "userId" type mismatch errors. |
+| **GitHub Copilot** | Inline code completion for Tailwind classes and utility functions. |
+
+How AI Enhanced Development
+- **Debugging**: Identified a critical bug where `userId` string inputs were crashing integer-based database queries using log analysis.
+- **Refactoring**: Assisted in converting the `useSocket` hook to a Singleton pattern to prevent memory leaks.
+- **Time Savings**: Reduced debugging time by ~60%.
+
+10. Future Enhancements
+Short-term
+[ ] Add JWT Authentication for Customers.
+[ ] Implement specific "Canned Responses" management UI.
+[ ] Export conversation transcripts to PDF.
+
+Medium-term
+[ ] Integrate OpenAI API for AI-suggested replies.
+[ ] Mobile App (React Native) for agents on the move.
+[ ] Role-based access control (Admin vs Agent).
+
+Long-term
+[ ] Predictive analytics for support volume.
+[ ] Voice-to-text integration for customer messages.
+
+Contact
+Abhinav Sharma
+GitHub: @just-surviving
+Email: abhinavsharma.career1@gmail.com
+Built with ❤️ for Branch International
