@@ -5,7 +5,7 @@ import { truncateText, formatRelativeTime } from '../../utils/formatters';
 import { URGENCY_COLORS } from '../../utils/constants';
 import LoadingSpinner from '../common/LoadingSpinner';
 import EmptyState from '../common/EmptyState';
-import { MessageSquare, Filter } from 'lucide-react';
+// Icons removed - currently not used
 
 interface ConversationListProps {
   selectedConversation: Conversation | null;
@@ -69,11 +69,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                filter === f
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
+              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${filter === f
+                ? 'bg-wa-green/20 dark:bg-wa-green/20 text-wa-green dark:text-wa-green'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
             >
               {f === 'all' ? 'All' : f === 'unread' ? 'Unread' : 'Urgent'}
             </button>
@@ -96,11 +95,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 <button
                   key={conv.id}
                   onClick={() => onSelectConversation(conv.id)}
-                  className={`w-full p-4 text-left transition-colors ${
-                    isSelected
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400'
-                      : 'hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent'
-                  }`}
+                  className={`w-full p-4 text-left transition-colors ${isSelected
+                    ? 'bg-wa-green/10 dark:bg-wa-green/10 border-l-4 border-wa-green dark:border-wa-green'
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent'
+                    }`}
                 >
                   <div className="flex items-start gap-3">
                     {/* Urgency indicator */}
@@ -113,7 +111,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                         <span className="font-medium text-gray-900 dark:text-white truncate">
                           {conv.customer?.name || `Customer ${conv.customer?.userId}`}
                         </span>
-                        <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">
                           {formatRelativeTime(conv.lastMessageAt)}
                         </span>
                       </div>
@@ -126,7 +124,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
                       <div className="flex items-center gap-2 mt-2">
                         {(conv.unreadCount || 0) > 0 && (
-                          <span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-medium rounded-full">
+                          <span className="px-2 py-0.5 bg-wa-green text-white text-xs font-medium rounded-full">
                             {conv.unreadCount}
                           </span>
                         )}
@@ -138,13 +136,12 @@ const ConversationList: React.FC<ConversationListProps> = ({
                           </span>
                         )}
                         <span
-                          className={`px-2 py-0.5 text-xs rounded-full ${
-                            conv.status === 'OPEN'
-                              ? 'bg-blue-100 text-blue-700'
-                              : conv.status === 'IN_PROGRESS'
+                          className={`px-2 py-0.5 text-xs rounded-full ${conv.status === 'OPEN'
+                            ? 'bg-wa-green/20 text-wa-green dark:bg-wa-green/30 dark:text-wa-green'
+                            : conv.status === 'IN_PROGRESS'
                               ? 'bg-yellow-100 text-yellow-700'
                               : 'bg-gray-100 text-gray-600'
-                          }`}
+                            }`}
                         >
                           {conv.status.replace('_', ' ')}
                         </span>

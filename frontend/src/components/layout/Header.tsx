@@ -1,30 +1,30 @@
 import React from 'react';
-import { MessageSquare, LogOut, User, Sun, Moon } from 'lucide-react';
+import { LogOut, User, Sun, Moon } from 'lucide-react';
 import type { Agent } from '../../types';
 import { useTheme } from '../../contexts/ThemeContext';
 
 interface HeaderProps {
-  agent: Agent | null;
-  agentCount: number;
-  isConnected: boolean;
+  agent?: Agent | null;
+  agentCount?: number;
+  isConnected?: boolean;
   onLogout?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ agent, agentCount, isConnected, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ agent = null, agentCount = 0, isConnected = false, onLogout }) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
+    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-wa-border px-6 py-3">
       <div className="flex items-center justify-between">
-        {/* Logo and title */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-            <MessageSquare className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Branch Support</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Customer Service Platform</p>
-          </div>
+        {/* Logo */}
+        <div className="flex items-center">
+          <img
+            src="/branch-logo.png"
+            alt="Branch"
+            width="107"
+            height="40"
+            className="h-8 object-contain dark:brightness-0 dark:invert"
+          />
         </div>
 
         {/* Right side */}
@@ -32,9 +32,8 @@ const Header: React.FC<HeaderProps> = ({ agent, agentCount, isConnected, onLogou
           {/* Connection status */}
           <div className="flex items-center gap-2">
             <div
-              className={`w-2 h-2 rounded-full ${
-                isConnected ? 'bg-green-500' : 'bg-red-500'
-              }`}
+              className={`w-2 h-2 rounded-full ${isConnected ? 'bg-wa-green' : 'bg-red-500'
+                }`}
             />
             <span className="text-sm text-gray-600 dark:text-gray-300">
               {isConnected ? 'Connected' : 'Disconnected'}
@@ -63,8 +62,8 @@ const Header: React.FC<HeaderProps> = ({ agent, agentCount, isConnected, onLogou
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{agent.name}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{agent.email}</p>
               </div>
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
+              <div className="w-10 h-10 bg-wa-green/20 dark:bg-wa-green/30 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-wa-green dark:text-wa-green">
                   {agent.name
                     .split(' ')
                     .map((n) => n[0])

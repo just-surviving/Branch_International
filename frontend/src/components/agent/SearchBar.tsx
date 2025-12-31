@@ -37,7 +37,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSelectConversation }) => {
   return (
     <div className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
           value={query}
@@ -47,7 +47,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSelectConversation }) => {
           }}
           onFocus={() => setIsOpen(true)}
           placeholder="Search messages, customers..."
-          className="w-64 pl-10 pr-10 py-2 text-sm bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+          className="w-64 pl-10 pr-10 py-2 text-sm bg-gray-100 dark:bg-[#202c33] border-0 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-wa-green focus:bg-white dark:focus:bg-[#2a3942] transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
         />
         {query && (
           <button

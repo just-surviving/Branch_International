@@ -16,54 +16,85 @@ body,
 }
 
 body {
-  @apply bg-white dark:bg-gray-900;
-  transition: background-color 0.2s ease;
+  background-color: #ffffff;
 }
 
-/* Custom scrollbar */
+html.dark body {
+  background-color: #111b21;
+}
+
+/* Custom scrollbar - WhatsApp style */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100 dark:bg-gray-800;
+  background: #f1f5f9;
   border-radius: 3px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #111b21;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-gray-600;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 
+html.dark ::-webkit-scrollbar-thumb {
+  background: #2a3942;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400 dark:bg-gray-500;
+  background: #94a3b8;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3d5a6c;
 }
 
 /* Urgency badge colors */
 .urgency-critical {
-  @apply bg-red-100 text-red-800 border-red-200;
+  @apply bg-red-500 text-white;
 }
 
 .urgency-high {
-  @apply bg-orange-100 text-orange-800 border-orange-200;
+  @apply bg-orange-500 text-white;
 }
 
 .urgency-medium {
-  @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+  @apply bg-yellow-500 text-white;
 }
 
 .urgency-low {
-  @apply bg-green-100 text-green-800 border-green-200;
+  @apply bg-green-500 text-white;
 }
 
-/* Message bubbles */
+/* WhatsApp-style message bubbles */
 .message-inbound {
-  @apply bg-gray-100 text-gray-900 rounded-tr-2xl rounded-tl-2xl rounded-br-2xl;
+  background-color: #f3f4f6;
+  color: #111827;
+  border-radius: 0 8px 8px 8px;
+  position: relative;
+}
+
+html.dark .message-inbound {
+  background-color: #202c33;
+  color: #e9edef;
 }
 
 .message-outbound {
-  @apply bg-blue-600 text-white rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl;
+  background-color: #dcf8c6;
+  color: #111827;
+  border-radius: 8px 0 8px 8px;
+  position: relative;
+}
+
+html.dark .message-outbound {
+  background-color: #005c4b;
+  color: #e9edef;
 }
 
 /* Animation for new messages */
@@ -72,6 +103,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -96,27 +128,41 @@ body {
 }
 
 @keyframes typingDot {
-  0%, 80%, 100% {
+
+  0%,
+  80%,
+  100% {
     transform: scale(0);
   }
+
   40% {
     transform: scale(1);
   }
 }
 
-/* Hover effects */
+/* Conversation item hover - WhatsApp style */
 .conversation-item:hover {
-  @apply bg-gray-50;
+  background-color: #f3f4f6;
+}
+
+html.dark .conversation-item:hover {
+  background-color: #2a3942;
 }
 
 .conversation-item.selected {
-  @apply bg-blue-50 border-l-4 border-blue-500;
+  background-color: #e0f2fe;
+  border-left: 4px solid #0ea5e9;
+}
+
+html.dark .conversation-item.selected {
+  background-color: #2a3942;
+  border-left: 4px solid #00a884;
 }
 
 /* Loading spinner */
 .spinner {
   border: 2px solid #f3f4f6;
-  border-top: 2px solid #3b82f6;
+  border-top: 2px solid #00a884;
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -124,6 +170,28 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* WhatsApp-style avatar placeholder animation */
+@keyframes avatarPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.avatar-animated {
+  animation: avatarPulse 2s ease-in-out infinite;
 }

@@ -7,12 +7,11 @@ import SearchBar from './SearchBar';
 import { useMessages } from '../../hooks/useMessages';
 import { getCustomers } from '../../services/api';
 import type { Customer } from '../../types';
-import LoadingSpinner from '../common/LoadingSpinner';
 
 const AgentDashboard: React.FC = () => {
-  const { conversations, selectedConversation, messages, loading, selectConversation } = useMessages();
+  const { selectedConversation, selectConversation } = useMessages();
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [loadingCustomers, setLoadingCustomers] = useState(true);
+  const [, setLoadingCustomers] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem('conversationSidebarWidth');
     return saved ? parseInt(saved, 10) : 320;
@@ -51,7 +50,7 @@ const AgentDashboard: React.FC = () => {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing) return;
-      
+
       const newWidth = e.clientX;
       if (newWidth >= 280 && newWidth <= 600) {
         setSidebarWidth(newWidth);
@@ -87,7 +86,7 @@ const AgentDashboard: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar - Conversation List */}
-        <div 
+        <div
           ref={sidebarRef}
           className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col relative"
           style={{ width: `${sidebarWidth}px` }}
@@ -96,13 +95,12 @@ const AgentDashboard: React.FC = () => {
             selectedConversation={selectedConversation}
             onSelectConversation={selectConversation}
           />
-          
+
           {/* Resize Handle */}
           <div
             onMouseDown={handleMouseDown}
-            className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-blue-500 dark:hover:bg-blue-400 transition-colors ${
-              isResizing ? 'bg-blue-500 dark:bg-blue-400' : 'bg-transparent'
-            }`}
+            className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-blue-500 dark:hover:bg-blue-400 transition-colors ${isResizing ? 'bg-blue-500 dark:bg-blue-400' : 'bg-transparent'
+              }`}
             style={{ zIndex: 10 }}
           >
             <div className="absolute top-1/2 right-0 -translate-y-1/2 w-4 h-12 -mr-1.5" />
@@ -114,8 +112,16 @@ const AgentDashboard: React.FC = () => {
           {selectedConversation ? (
             <MessageThread
               conversation={selectedConversation}
-              messages={messages}
-              loading={loading}
+              onResolve={(conversationId) => {
+                import('../../services/socketService').then(({ resolveConversation }) => {
+                  resolveConversation(conversationId);
+                });
+              }}
+              onReopen={(conversationId) => {
+                import('../../services/socketService').then(({ reopenConversation }) => {
+                  reopenConversation(conversationId);
+                });
+              }}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">

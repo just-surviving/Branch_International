@@ -115,6 +115,38 @@ export async function getCustomerByUserId(req: Request, res: Response) {
   }
 }
 
+export async function getCustomerMessages(req: Request, res: Response) {
+  try {
+    const { userId } = req.params;
+
+    // Find customer by userId
+    const customer = await prisma.customer.findUnique({
+      where: { userId: parseInt(userId) }
+    });
+
+    if (!customer) {
+      // Return empty array if customer doesn't exist yet
+      return res.json([]);
+    }
+
+    // Get all messages for this customer across all conversations
+    const messages = await prisma.message.findMany({
+      where: { customerId: customer.id },
+      include: {
+        agent: {
+          select: { name: true }
+        }
+      },
+      orderBy: { timestamp: 'asc' }
+    });
+
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching customer messages:', error);
+    res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+}
+
 export async function createCustomer(req: Request, res: Response) {
   try {
     const { userId, name, email, phone, accountStatus, creditScore, accountAge, loanStatus } = req.body;

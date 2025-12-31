@@ -3,6 +3,7 @@ import {
   getCustomers,
   getCustomer,
   getCustomerByUserId,
+  getCustomerMessages,
   createCustomer,
   updateCustomer,
   getCustomerStats
@@ -21,6 +22,9 @@ router.get('/:id', getCustomer);
 
 // Get customer by User ID (from CSV)
 router.get('/user/:userId', getCustomerByUserId);
+
+// Get customer messages by User ID
+router.get('/:userId/messages', getCustomerMessages);
 
 // Create new customer
 router.post('/', createCustomer);

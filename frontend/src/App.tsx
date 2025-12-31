@@ -14,23 +14,25 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          {/* Redirect root to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          
-          {/* Login page */}
-          <Route path="/login" element={<Login />} />
-          
-          {/* Agent portal */}
-          <Route path="/agent/portal" element={<AgentPortal />} />
-          
-          {/* Customer page */}
-          <Route path="/customer" element={<CustomerPage />} />
-          
-          {/* 404 fallback */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <main className="min-h-screen">
+          <Routes>
+            {/* Redirect root to login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
+            {/* Login page */}
+            <Route path="/login" element={<Login />} />
+
+            {/* Agent portal */}
+            <Route path="/agent/portal" element={<AgentPortal />} />
+
+            {/* Customer page */}
+            <Route path="/customer" element={<CustomerPage />} />
+
+            {/* 404 fallback */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </main>
       </BrowserRouter>
 
       {/* Toast notifications */}
