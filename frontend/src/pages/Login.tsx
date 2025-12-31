@@ -189,7 +189,7 @@ const Login: React.FC = () => {
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-blue-200 dark:text-gray-400">
-          <p>© 2024 Branch International. All rights reserved.</p>
+          <p>© 2025 Branch International. All rights reserved.</p>
         </div>
       </div>
     </div>
