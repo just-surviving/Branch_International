@@ -19,7 +19,10 @@ const httpServer = createServer(app);
 
 // CORS origins for different environments
 const corsOrigins = process.env.NODE_ENV === 'production'
-  ? [process.env.FRONTEND_URL || 'https://branch-messaging.vercel.app']
+  ? [
+    process.env.FRONTEND_URL || 'https://branch-abhinav.netlify.app',
+    'https://branch-abhinav.netlify.app'
+  ]
   : [
     'http://localhost:5173',
     'http://localhost:5174',
