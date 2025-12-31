@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Message, Customer, Agent, Conversation, CannedResponse, SearchResults, Stats, UrgencyResult } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -76,6 +76,11 @@ export const getCustomer = async (id: number): Promise<Customer> => {
 
 export const getCustomerByUserId = async (userId: number): Promise<Customer> => {
   const { data } = await api.get(`/customers/user/${userId}`);
+  return data;
+};
+
+export const getCustomerMessages = async (userId: string): Promise<Message[]> => {
+  const { data } = await api.get(`/customers/${userId}/messages`);
   return data;
 };
 

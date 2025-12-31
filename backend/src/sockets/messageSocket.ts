@@ -29,10 +29,10 @@ export function initializeSocket(io: Server) {
     // Agent joins
     socket.on('agent:join', async (data: { agentId: number; agentName?: string }) => {
       const { agentId, agentName } = data;
-      
+
       socket.agentId = agentId;
       socket.agentName = agentName;
-      
+
       connectedAgents.set(agentId, {
         socketId: socket.id,
         agentId,
@@ -60,24 +60,30 @@ export function initializeSocket(io: Server) {
     // New message from customer
     socket.on('message:new', async (data: {
       customerId: number;
-      userId: number;
+      userId: string | number;
       conversationId?: number;
       content: string;
     }) => {
       try {
         logger.socket(`New message from customer ${data.userId}: ${data.content.substring(0, 50)}...`);
 
+        const userIdInt = typeof data.userId === 'string' ? parseInt(data.userId, 10) : data.userId;
+
+        if (isNaN(userIdInt)) {
+          throw new Error('Invalid User ID');
+        }
+
         // Find or create customer
         let customer = await prisma.customer.findUnique({
-          where: { userId: data.userId }
+          where: { userId: userIdInt }
         });
 
         if (!customer) {
           customer = await prisma.customer.create({
             data: {
-              userId: data.userId,
-              name: `Customer ${data.userId}`,
-              email: `customer${data.userId}@example.com`,
+              userId: userIdInt,
+              name: `Customer ${userIdInt}`,
+              email: `customer${userIdInt}@example.com`,
               accountStatus: 'active'
             }
           });
@@ -257,6 +263,95 @@ export function initializeSocket(io: Server) {
         logger.socket(`Conversation ${conversationId} resolved by agent ${socket.agentId}`);
       } catch (error) {
         logger.error('Error resolving conversation:', error);
+      }
+    });
+
+    // Reopen conversation
+    socket.on('conversation:reopen', async (conversationId: number) => {
+      try {
+        await prisma.conversation.update({
+          where: { id: conversationId },
+          data: {
+            status: 'OPEN',
+            resolvedAt: null
+          }
+        });
+
+        // Mark all messages as unread
+        await prisma.message.updateMany({
+          where: { conversationId, direction: 'INBOUND' },
+          data: { status: 'UNREAD' }
+        });
+
+        io.emit('conversation:reopened', { conversationId });
+
+        logger.socket(`Conversation ${conversationId} reopened by agent ${socket.agentId}`);
+      } catch (error) {
+        logger.error('Error reopening conversation:', error);
+      }
+    });
+
+    // Update message urgency
+    socket.on('message:update-urgency', async (data: { messageId: number; urgencyLevel: string }) => {
+      try {
+        const urgencyScores: Record<string, number> = {
+          'LOW': 3,
+          'MEDIUM': 5,
+          'HIGH': 8,
+          'CRITICAL': 10
+        };
+
+        const message = await prisma.message.update({
+          where: { id: data.messageId },
+          data: {
+            urgencyLevel: data.urgencyLevel as any,
+            urgencyScore: urgencyScores[data.urgencyLevel] || 5
+          },
+          include: { customer: true, conversation: true }
+        });
+
+        io.emit('message:urgency-updated', {
+          messageId: data.messageId,
+          urgencyLevel: data.urgencyLevel,
+          conversationId: message.conversationId
+        });
+
+        logger.socket(`Message ${data.messageId} urgency updated to ${data.urgencyLevel} by agent ${socket.agentId}`);
+      } catch (error) {
+        logger.error('Error updating message urgency:', error);
+      }
+    });
+
+    // Update conversation priority (by updating the most recent message's urgency)
+    socket.on('conversation:update-priority', async (data: { conversationId: number; priority: string }) => {
+      try {
+        const urgencyScores: Record<string, number> = {
+          'LOW': 3,
+          'MEDIUM': 5,
+          'HIGH': 8,
+          'CRITICAL': 10
+        };
+
+        // Update all inbound messages in this conversation to the new priority
+        await prisma.message.updateMany({
+          where: {
+            conversationId: data.conversationId,
+            direction: 'INBOUND'
+          },
+          data: {
+            urgencyLevel: data.priority as any,
+            urgencyScore: urgencyScores[data.priority] || 5
+          }
+        });
+
+        io.emit('conversation:priority-updated', {
+          conversationId: data.conversationId,
+          priority: data.priority
+        });
+
+        logger.socket(`Conversation ${data.conversationId} priority updated to ${data.priority} by agent ${socket.agentId}`);
+      } catch (error) {
+        logger.error('Error updating conversation priority:', error);
       }
     });
 

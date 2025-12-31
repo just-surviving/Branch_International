@@ -2,6 +2,11 @@
 
 A production-ready customer service messaging platform built with React, Node.js, PostgreSQL, and real-time WebSocket communication.
 
+## Documentation
+
+*   **[Architecture Guide](./ARCHITECTURE.md)** - Detailed system design, data flow, and schema explanation.
+*   **[Demo Video Script](./DEMO_SCRIPT.md)** - Step-by-step guide for demonstrating the application.
+
 ## Features
 
 - **Real-time Messaging** - Instant bidirectional communication using Socket.io
@@ -44,7 +49,7 @@ cd ../frontend && npm install
 ### 2. Database Setup
 
 ```bash
-# Start PostgreSQL with Docker
+# Start PostgreSQL with Docker (optional if you have local Postgres)
 docker-compose up -d postgres
 
 # Run migrations and seed data
@@ -55,12 +60,14 @@ npm run seed
 
 ### 3. Start the Application
 
+The application requires two terminals running simultaneously:
+
 ```bash
-# Terminal 1 - Backend
+# Terminal 1 - Backend (Runs on Port 3001)
 cd backend
 npm run dev
 
-# Terminal 2 - Frontend
+# Terminal 2 - Frontend (Runs on Port 5173)
 cd frontend
 npm run dev
 ```
@@ -71,7 +78,7 @@ npm run dev
 |-----|-------------|
 | http://localhost:5173 | Agent Portal |
 | http://localhost:5173/customer | Customer Message Form |
-| http://localhost:3000/api | Backend API |
+| http://localhost:3001/api | Backend API |
 
 ### Demo Accounts
 
@@ -104,6 +111,7 @@ branch-messaging-platform/
 │   │   └── App.tsx       # Root component
 │   └── package.json
 ├── docker-compose.yml    # Container orchestration
+├── ARCHITECTURE.md       # System design docs
 └── README.md
 ```
 
@@ -147,12 +155,12 @@ Create `.env` files in both `backend/` and `frontend/` directories:
 ```env
 # backend/.env
 DATABASE_URL="postgresql://user:password@localhost:5432/branch_messaging"
-PORT=3000
+PORT=3001
 FRONTEND_URL="http://localhost:5173"
 
 # frontend/.env
-VITE_API_URL="http://localhost:3000"
-VITE_WS_URL="http://localhost:3000"
+VITE_API_URL="http://localhost:3001"
+VITE_WS_URL="http://localhost:3001"
 ```
 
 ## Docker Deployment
@@ -164,25 +172,3 @@ docker-compose up --build
 # Or run in background
 docker-compose up -d
 ```
-
-## Testing
-
-```bash
-# Backend
-cd backend && npm test
-
-# Frontend
-cd frontend && npm test
-```
-
-## Demo Script
-
-Run the automated demo to simulate real-time customer messages:
-
-```bash
-node demo-script.js staggered
-```
-
-## License
-
-© 2025 Branch International. All rights reserved.

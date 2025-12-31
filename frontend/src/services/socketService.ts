@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import type { Message } from '../types';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:3000';
+const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
 
 let socket: Socket | null = null;
 
@@ -34,7 +34,11 @@ export const connectSocket = (): Socket => {
 
 export const disconnectSocket = (): void => {
   if (socket) {
-    socket.disconnect();
+    if (socket.connected) {
+      socket.disconnect();
+    } else {
+      socket.close();
+    }
     socket = null;
   }
 };
@@ -45,8 +49,11 @@ export const getSocket = (): Socket | null => {
 
 // Agent actions
 export const joinAsAgent = (agentId: number, agentName?: string): void => {
-  if (socket) {
+  if (socket && socket.connected) {
+    console.log('Emitting agent:join', { agentId, agentName });
     socket.emit('agent:join', { agentId, agentName });
+  } else {
+    console.warn('Socket not connected, cannot join as agent');
   }
 };
 
@@ -86,16 +93,42 @@ export const resolveConversation = (conversationId: number): void => {
   }
 };
 
+export const reopenConversation = (conversationId: number): void => {
+  if (socket) {
+    socket.emit('conversation:reopen', conversationId);
+  }
+};
+
+export const updateMessageUrgency = (messageId: number, urgencyLevel: string): void => {
+  if (socket) {
+    socket.emit('message:update-urgency', { messageId, urgencyLevel });
+  }
+};
+
 // Customer actions
 export const sendCustomerMessage = (data: {
   userId: string;
   content: string;
 }): void => {
+  // Ensure we have a socket
+  if (!socket) {
+    console.log('Socket was null in sendCustomerMessage, connecting...');
+    socket = connectSocket();
+  }
+
+  // Log the attempt
+  console.log('Attempting to send customer message:', data);
+
   if (socket) {
+    // Socket.io buffers events if not connected, so this is generally safe
+    // provided we have the socket instance
     socket.emit('message:new', {
       userId: data.userId,
       content: data.content,
     });
+    console.log('Emitted message:new event');
+  } else {
+    console.error('Failed to get socket instance for sending message');
   }
 };
 
@@ -139,6 +172,18 @@ export const onMessageStatus = (callback: (data: { messageId: number; status: st
 export const onConversationResolved = (callback: (data: { conversationId: number }) => void): void => {
   if (socket) {
     socket.on('conversation:resolved', callback);
+  }
+};
+
+export const onConversationReopened = (callback: (data: { conversationId: number }) => void): void => {
+  if (socket) {
+    socket.on('conversation:reopened', callback);
+  }
+};
+
+export const onUrgencyUpdated = (callback: (data: { messageId: number; urgencyLevel: string }) => void): void => {
+  if (socket) {
+    socket.on('message:urgency-updated', callback);
   }
 };
 
