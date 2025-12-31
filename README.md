@@ -2,6 +2,8 @@
 
 A production-ready customer service messaging platform built with React, Node.js, PostgreSQL, and real-time WebSocket communication.
 
+![Branch Messaging Dashboard](./screenshots/dashboard.png)
+
 ## Documentation
 
 *   **[Project Report](./PROJECT_REPORT.md)** - Detailed system design, approach, trade-offs, and architecture.

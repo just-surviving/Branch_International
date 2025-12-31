@@ -32,6 +32,9 @@ The Branch Messaging Platform is a full-stack real-time support system designed 
 - **Agent Presence**: Live tracking of online agents to prevent collision.
 - **Unified History**: Persistent chat history stored in a relational database.
 
+![Agent Dashboard](./screenshots/dashboard.png)
+*Figure 1: Agent Dashboard showing real-time conversation queue and urgency indicators.*
+
 2. Tech Stack & Justification
 | Category | Technology | Justification |
 | :--- | :--- | :--- |
@@ -110,6 +113,9 @@ App
 - **Typing Indicators**: Ephemeral events (`agent:typing`) show activity without database writes.
 - **Sync**: Multi-tab support ensures agents see the same state across windows.
 
+![Customer Portal](./screenshots/customer_portal.png)
+*Figure 2: Customer Portal for creating new urgency-detected tickets.*
+
 4.3 Agent Dashboard
 - **Queue Management**: Filter conversations by urgency, status (Open/Resolved), or IDs.
 - **Customer Context**: Side panel displaying customer details (Name, Credit Score, Account Status).
@@ -172,7 +178,7 @@ branch-messaging-platform/
 │   │   └── App.tsx
 │   └── package.json
 ├── docker-compose.yml      # Container Orchestration
-└── PROJECT_REPORT.md       # Documentation
+├── PROJECT_REPORT.md       # Documentation
 
 8. Getting Started
 Prerequisites
@@ -200,6 +206,9 @@ Installation
    
    # Terminal 2 (Frontend - Port 5173)
    cd frontend && npm run dev
+
+![Login Page](./screenshots/login.png)
+*Figure 3: Agent Portal Login Screen.*
 
 9. AI Tools Usage
 This project utilized advanced AI agents to accelerate robustness and debugging:
