@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U branch -d branch_messaging"]
+      test: [ "CMD-SHELL", "pg_isready -U branch -d branch_messaging" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,10 +24,10 @@ services:
     build: ./backend
     container_name: branch_backend
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
       DATABASE_URL: postgresql://branch:branch123@postgres:5432/branch_messaging
-      PORT: 3000
+      PORT: 3001
       NODE_ENV: development
       FRONTEND_URL: http://localhost:5173
     depends_on:
@@ -47,8 +47,8 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: http://localhost:3000
-      VITE_WS_URL: http://localhost:3000
+      VITE_API_URL: http://localhost:3001
+      VITE_WS_URL: http://localhost:3001
     depends_on:
       - backend
     volumes:
@@ -60,6 +60,7 @@ services:
 
 volumes:
   postgres_data:
+
 
 networks:
   branch_network:
