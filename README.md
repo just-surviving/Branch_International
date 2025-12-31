@@ -6,7 +6,7 @@ A production-ready customer service messaging platform built with React, Node.js
 
 ## Documentation
 
-*   **[Project Report](./PROJECT_REPORT.md)** - Detailed system design, approach, trade-offs, and architecture.
+*   **[Project Report](https://docs.google.com/document/d/199TahStVd4KHSu7YGpVmtQmAlyhpJLSw4CfiIOI_A9E/edit?usp=sharing)** - Detailed system design, approach, trade-offs, and architecture.
 
 ## Features
 
