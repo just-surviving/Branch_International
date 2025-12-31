@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquare, User, Lock, Loader2 } from 'lucide-react';
+import { User, Lock, Loader2 } from 'lucide-react';
 import { getAgents, updateAgentStatus } from '../services/api';
 import { storeAgent } from '../services/authService';
-import { joinAsAgent } from '../services/socketService';
 import toast from 'react-hot-toast';
 
 const Login: React.FC = () => {
@@ -36,8 +35,7 @@ const Login: React.FC = () => {
       // Update agent status to available
       await updateAgentStatus(agent.id, 'AVAILABLE');
 
-      // Join as agent via WebSocket
-      joinAsAgent(agent.id, agent.name);
+      // Join as agent via WebSocket will be handled by AgentPortal upon navigation
 
       toast.success(`Welcome back, ${agent.name}!`);
       navigate('/agent/portal');
@@ -66,10 +64,13 @@ const Login: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Logo and Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 rounded-full mb-4 shadow-lg">
-            <MessageSquare className="w-8 h-8" />
+          <div className="inline-flex items-center justify-center bg-white dark:bg-gray-800 rounded-full px-6 py-3 mb-4 shadow-lg">
+            <img
+              src="/branch-logo.png"
+              alt="Branch"
+              className="h-12 object-contain"
+            />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Branch Support</h1>
           <p className="text-blue-100 dark:text-gray-300">Agent Portal Login</p>
         </div>
 

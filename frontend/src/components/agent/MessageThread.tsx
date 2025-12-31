@@ -5,16 +5,16 @@ import MessageInput from './MessageInput';
 import LoadingSpinner from '../common/LoadingSpinner';
 import EmptyState from '../common/EmptyState';
 import { getConversation } from '../../services/api';
-import { onMessageReceived, onMessageSent, offMessageReceived, offMessageSent } from '../../services/socketService';
 import { formatDate } from '../../utils/formatters';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, RotateCcw } from 'lucide-react';
 
 interface MessageThreadProps {
   conversation: Conversation;
   onResolve?: (conversationId: number) => void;
+  onReopen?: (conversationId: number) => void;
 }
 
-const MessageThread: React.FC<MessageThreadProps> = ({ conversation, onResolve }) => {
+const MessageThread: React.FC<MessageThreadProps> = ({ conversation, onResolve, onReopen }) => {
   const [messages, setMessages] = useState<Message[]>(conversation.messages || []);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -44,24 +44,41 @@ const MessageThread: React.FC<MessageThreadProps> = ({ conversation, onResolve }
   }, [messages]);
 
   useEffect(() => {
-    const handleNewMessage = (message: Message) => {
-      if (message.conversationId === conversation.id) {
-        setMessages((prev) => [...prev, message]);
-      }
-    };
+    const socket = import('../../services/socketService').then(({ connectSocket }) => {
+      const socket = connectSocket();
 
-    const handleSentMessage = (message: Message) => {
-      if (message.conversationId === conversation.id) {
-        setMessages((prev) => [...prev, message]);
-      }
-    };
+      const handleNewMessage = (message: Message) => {
+        console.log('MessageThread received message:', message, 'Current Conv ID:', conversation.id);
+        // Loose comparison or explicit number conversion to handle potential type mismatches
+        if (Number(message.conversationId) === Number(conversation.id)) {
+          setMessages((prev) => {
+            if (prev.some(m => m.id === message.id)) return prev;
+            return [...prev, message];
+          });
+        }
+      };
 
-    onMessageReceived(handleNewMessage);
-    onMessageSent(handleSentMessage);
+      const handleSentMessage = (message: Message) => {
+        if (Number(message.conversationId) === Number(conversation.id)) {
+          setMessages((prev) => {
+            if (prev.some(m => m.id === message.id)) return prev;
+            return [...prev, message];
+          });
+        }
+      };
+
+      socket.on('message:received', handleNewMessage);
+      socket.on('message:sent', handleSentMessage);
+
+      // Cleanup
+      return () => {
+        socket.off('message:received', handleNewMessage);
+        socket.off('message:sent', handleSentMessage);
+      };
+    });
 
     return () => {
-      offMessageReceived(handleNewMessage);
-      offMessageSent(handleSentMessage);
+      socket.then((cleanup) => cleanup && cleanup());
     };
   }, [conversation.id]);
 
@@ -112,9 +129,18 @@ const MessageThread: React.FC<MessageThreadProps> = ({ conversation, onResolve }
             </button>
           )}
           {conversation.status === 'RESOLVED' && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg">
-              <CheckCircle className="w-4 h-4" />
-              Resolved
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg">
+                <CheckCircle className="w-4 h-4" />
+                Resolved
+              </div>
+              <button
+                onClick={() => onReopen?.(conversation.id)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Reopen
+              </button>
             </div>
           )}
         </div>
